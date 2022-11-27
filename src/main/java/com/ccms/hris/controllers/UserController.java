@@ -1,5 +1,6 @@
 package com.ccms.hris.controllers;
 
+import com.ccms.hris.enums.UserStatus;
 import com.ccms.hris.models.ResponseWrapper;
 import com.ccms.hris.models.dto.UserCreationDto;
 import com.ccms.hris.models.dto.UserDto;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -93,6 +95,35 @@ public class UserController {
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseWrapper("", "failed", e.getMessage()));
+        }
+    }
+
+
+    @GetMapping("/filter")
+    public ResponseWrapper getByStatusAndId(
+            @RequestParam(name = "q", defaultValue = "", required = false) String q,
+            @RequestParam(name = "userStatus",  required = false) UserStatus userStatus
+    ) {
+
+        try{
+            List<User> users = userService.filterUsers(q, userStatus);
+            return new ResponseWrapper<>(users, "success", "fetched");
+        }catch (Exception e){
+            return new ResponseWrapper<>(null, "failed", e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/{id}/status")
+    public ResponseEntity updateUserStatus(@PathVariable long id,
+                                           @RequestParam(name = "userStatus",  required = true) UserStatus userStatus
+
+    ) {
+        try {
+            userService.updateUserStatus(id, userStatus);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper("success", "success", "updated"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseWrapper("failed", "failed", e.getMessage()));
         }
     }
 

@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 
@@ -163,5 +164,34 @@ public class UserService {
 		dto.setDesignation(user.getDesignation());
 
 		return dto;
+	}
+
+	public List<User> filterUsers(String q, UserStatus userStatus) {
+
+		if(userStatus == null && !q.equals("")) {
+			return userRepo.findAllByFirstNameContainingOrLastNameContainingOrEmailContaining(q, q, q);
+		}
+		else if(userStatus != null && q.equals("")) {
+			return userRepo.findAllByUserStatus(userStatus);
+		}
+		else if(userStatus == null && q.equals("")) {
+			return userRepo.findAll();
+		}
+		else {
+			return userRepo.findAllByUserStatusAndFirstNameContainingOrUserStatusAndLastNameContainingOrUserStatusAndEmailContaining(userStatus, q, userStatus, q, userStatus, q);
+		}
+
+
+	}
+
+	public void updateUserStatus(long id, UserStatus userStatus) throws Exception {
+		System.out.println(id);
+		Optional<User> user = userRepo.findById(id);
+
+		if(user.isEmpty()) throw new Exception("User not Found");
+		else {
+			user.get().setUserStatus(userStatus);
+			userRepo.save(user.get());
+		}
 	}
 }
