@@ -46,7 +46,7 @@ public class UserService {
 	}
 
 	public Page<UserDto> getAllUsers(int pageNo, int pageSize) {
-		Page<User> userList = userRepo.findAll(PageRequest.of(pageNo, pageSize));
+		Page<User> userList = userRepo.findAll(PageRequest.of(pageNo-1, pageSize));
 		return userToUserDtoPage(userList);
 	}
 
@@ -69,7 +69,7 @@ public class UserService {
 
 		user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-		Role userRole = roleRepo.findByName("USER");
+		Role userRole = roleRepo.findByName("EMPLOYEE");
 		user.setRoles(Arrays.asList(userRole));
 
 		user.setUserStatus(UserStatus.ACTIVE);

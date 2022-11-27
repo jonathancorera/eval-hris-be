@@ -9,6 +9,7 @@ import com.ccms.hris.utils.JwtUtil;
 import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Propagation;
@@ -48,9 +49,12 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public ResponseEntity getAllUsers() {
+    public ResponseEntity getAllUsers(
+            @RequestParam(name = "pageNo", defaultValue = "1", required = false) int page,
+            @RequestParam(name = "pageSize", defaultValue = "10", required = false) int offset
+    ) {
         try {
-            List<UserDto> users = userService.getAllUsers();
+            Page<UserDto> users = userService.getAllUsers(page, offset);
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseWrapper(users, "success", "fetched"));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
